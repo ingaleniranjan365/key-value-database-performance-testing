@@ -47,7 +47,7 @@ public class WriteReadSimulation extends Simulation {
 
         {
                 setUp(
-                        insertAndRetrieve.injectOpen(rampUsers(5).during(3))
+                        insertAndRetrieve.injectOpen(rampUsers(360000).during(3600))
                 ).protocols(httpProtocol);
         }
 

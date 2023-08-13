@@ -16,9 +16,7 @@ public class ReadSimulation extends Simulation {
                 .exec(
                         http("retrieve")
                                 .get("/latest/element/#{id}")
-                                .check(
-                                        status().is(200)
-                                )
+                                .check(status().is(200))
                 );
 
 
@@ -29,7 +27,7 @@ public class ReadSimulation extends Simulation {
 
         {
                 setUp(
-                        retrieve.injectOpen(rampUsers(5).during(3))
+                        retrieve.injectOpen(rampUsers(150000).during(300))
                 ).protocols(httpProtocol);
         }
 

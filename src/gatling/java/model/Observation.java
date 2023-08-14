@@ -16,7 +16,7 @@ public class Observation extends Trip {
                 super(session);
                 this.lon = session.getDouble("lon");
                 this.lat = session.getDouble("lat");
-                this.timestamp = getFormattedTimestampString(session.getString("timestamp"));
+                this.timestamp = getFormattedTimestampStringCopy(session.getString("timestamp"));
         }
 
         public Observation(String jsonString) throws IOException {

@@ -31,7 +31,7 @@ public class Trip {
                 this.pickupLongitude = session.getDouble("pickup_longitude");
                 this.pickupLatitude = session.getDouble("pickup_latitude");
                 this.id = session.getString("id");
-                this.pickupDatetime = getFormattedTimestampString(session.getString("pickup_datetime"));
+                this.pickupDatetime = getFormattedTimestampStringCopy(session.getString("pickup_datetime"));
                 this.storeAndFwdFlag = session.getString("store_and_fwd_flag");
                 this.tripDuration = session.getString("trip_duration");
                 this.dropoffLongitude = getDouble(Objects.requireNonNull(session.getString("dropoff_longitude")));
@@ -57,11 +57,18 @@ public class Trip {
         }
 
 
-        public String getFormattedTimestampString(String timestamp) {
+        public String getFormattedTimestampStringCopy(String timestamp) {
                 OffsetDateTime offsetDateTime = OffsetDateTime.parse(timestamp);
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 return offsetDateTime.format(formatter);
         }
+
+        public static String getFormattedTimestampString(String timestamp) {
+                OffsetDateTime offsetDateTime = OffsetDateTime.parse(timestamp);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                return offsetDateTime.format(formatter);
+        }
+
 
         public Optional<Double> getDouble(String floatStr) {
                 if(floatStr.equals("")) {
@@ -75,7 +82,7 @@ public class Trip {
                 if(timestamp.equals("")) {
                         return Optional.empty();
                 } else {
-                        return Optional.of(getFormattedTimestampString(timestamp));
+                        return Optional.of(getFormattedTimestampStringCopy(timestamp));
                 }
         }
 

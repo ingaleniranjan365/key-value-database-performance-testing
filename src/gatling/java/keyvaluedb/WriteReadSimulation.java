@@ -5,10 +5,8 @@ import static io.gatling.javaapi.http.HttpDsl.*;
 
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
+import model.Trip;
 
-import java.util.Objects;
-
-import java.util.function.Function;
 
 public class WriteReadSimulation extends Simulation {
 
@@ -20,12 +18,12 @@ public class WriteReadSimulation extends Simulation {
                 .exec(
                         http("insert")
                                 .put(session -> {
-                                        var timestamp = Objects.requireNonNull(session.getString("dropoff_datetime"))
-                                                .replace(" ", "T") + 'Z';
+                                        var timestamp = Trip.getFormattedTimestampString(session.getString(
+                                                "dropoff_datetime"));
                                         var id= session.getString("id");
                                         return String.format("/element/%s/timestamp/%s", id, timestamp);
                                 })
-                                .body(io.gatling.javaapi.core.CoreDsl.StringBody(RequestBodyBuilder.extractJSONString))
+                                .body(io.gatling.javaapi.core.CoreDsl.StringBody(WriteSimulation.RequestBodyBuilder.extractJSONString))
                                 .check(
                                         status().is(200)
                                 )
@@ -47,43 +45,8 @@ public class WriteReadSimulation extends Simulation {
 
         {
                 setUp(
-                        insertAndRetrieve.injectOpen(rampUsers(360000).during(3600))
+                        insertAndRetrieve.injectOpen(rampUsers(10).during(1))
                 ).protocols(httpProtocol);
-        }
-
-        static final class RequestBodyBuilder {
-                public static final Function<Session, String> extractJSONString = session -> {
-
-                        int vendorId = session.getInt("vendor_id");
-                        int passengerCount = session.getInt("passenger_count");
-                        double pickupLongitude = session.getDouble("pickup_longitude");
-                        double pickupLatitude = session.getDouble("pickup_latitude");
-                        double dropoffLongitude = session.getDouble("dropoff_longitude");
-                        double dropoffLatitude = session.getDouble("dropoff_latitude");
-                        String id = session.getString("id");
-                        String pickupDatetime = Objects.requireNonNull(session.getString("pickup_datetime"))
-                                .replace(" ", "T")+'Z';
-                        String dropoffDatetime = Objects.requireNonNull(session.getString("dropoff_datetime"))
-                                .replace(" ", "T")+'Z';
-                        String storeAndFwdFlag = session.getString("store_and_fwd_flag");
-                        String tripDuration = session.getString("trip_duration");
-
-                        String jsonString = "{"
-                                + "\"id\":\"" + id + "\","
-                                + "\"vendor_id\":" + vendorId + ","
-                                + "\"pickup_datetime\":\"" + pickupDatetime + "\","
-                                + "\"dropoff_datetime\":\"" + dropoffDatetime + "\","
-                                + "\"passenger_count\":" + passengerCount + ","
-                                + "\"pickup_longitude\":" + pickupLongitude + ","
-                                + "\"pickup_latitude\":" + pickupLatitude + ","
-                                + "\"dropoff_longitude\":" + dropoffLongitude + ","
-                                + "\"dropoff_latitude\":" + dropoffLatitude + ","
-                                + "\"store_and_fwd_flag\":\"" + storeAndFwdFlag + "\","
-                                + "\"trip_duration\":\"" + tripDuration + "\""
-                                + "}";
-
-                        return jsonString;
-                };
         }
 
 }

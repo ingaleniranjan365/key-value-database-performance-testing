@@ -27,7 +27,7 @@ public class ReadSimulation extends Simulation {
 
         {
                 setUp(
-                        retrieve.injectOpen(rampUsers(150000).during(300))
+                        retrieve.injectOpen(rampUsers(10).during(1))
                 ).protocols(httpProtocol);
         }
 

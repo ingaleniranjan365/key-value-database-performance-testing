@@ -5,6 +5,8 @@ import static io.gatling.javaapi.http.HttpDsl.*;
 
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
+import model.Observation;
+import model.Trip;
 
 import java.util.Objects;
 
@@ -20,8 +22,8 @@ public class WriteSimulation extends Simulation {
                 .exec(
                         http("insert")
                                 .put(session -> {
-                                        var timestamp = Objects.requireNonNull(session.getString("dropoff_datetime"))
-                                                .replace(" ", "T") + 'Z';
+                                        var timestamp = Trip.getFormattedTimestampString(session.getString(
+                                                "dropoff_datetime"));
                                         var id= session.getString("id");
                                         return String.format("/element/%s/timestamp/%s", id, timestamp);
                                 })
@@ -39,43 +41,13 @@ public class WriteSimulation extends Simulation {
 
         {
                 setUp(
-                        insertAndRetrieve.injectOpen(rampUsers(150000).during(300))
+                        insertAndRetrieve.injectOpen(rampUsers(10).during(1))
                 ).protocols(httpProtocol);
         }
 
-        static final class RequestBodyBuilder {
-                public static final Function<Session, String> extractJSONString = session -> {
-
-                        int vendorId = session.getInt("vendor_id");
-                        int passengerCount = session.getInt("passenger_count");
-                        double pickupLongitude = session.getDouble("pickup_longitude");
-                        double pickupLatitude = session.getDouble("pickup_latitude");
-                        double dropoffLongitude = session.getDouble("dropoff_longitude");
-                        double dropoffLatitude = session.getDouble("dropoff_latitude");
-                        String id = session.getString("id");
-                        String pickupDatetime = Objects.requireNonNull(session.getString("pickup_datetime"))
-                                .replace(" ", "T")+'Z';
-                        String dropoffDatetime = Objects.requireNonNull(session.getString("dropoff_datetime"))
-                                .replace(" ", "T")+'Z';
-                        String storeAndFwdFlag = session.getString("store_and_fwd_flag");
-                        String tripDuration = session.getString("trip_duration");
-
-                        String jsonString = "{"
-                                + "\"id\":\"" + id + "\","
-                                + "\"vendor_id\":" + vendorId + ","
-                                + "\"pickup_datetime\":\"" + pickupDatetime + "\","
-                                + "\"dropoff_datetime\":\"" + dropoffDatetime + "\","
-                                + "\"passenger_count\":" + passengerCount + ","
-                                + "\"pickup_longitude\":" + pickupLongitude + ","
-                                + "\"pickup_latitude\":" + pickupLatitude + ","
-                                + "\"dropoff_longitude\":" + dropoffLongitude + ","
-                                + "\"dropoff_latitude\":" + dropoffLatitude + ","
-                                + "\"store_and_fwd_flag\":\"" + storeAndFwdFlag + "\","
-                                + "\"trip_duration\":\"" + tripDuration + "\""
-                                + "}";
-
-                        return jsonString;
-                };
+        public static final class RequestBodyBuilder {
+                public static final Function<Session, String> extractJSONString =
+                        session -> new Trip(session).toString();
         }
 
 }

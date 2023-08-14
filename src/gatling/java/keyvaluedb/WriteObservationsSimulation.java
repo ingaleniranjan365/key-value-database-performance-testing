@@ -7,8 +7,6 @@ import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
 import model.Observation;
 
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.function.Function;
 
 public class WriteObservationsSimulation extends Simulation {
@@ -22,7 +20,7 @@ public class WriteObservationsSimulation extends Simulation {
                         http("insert")
                                 .put(session -> {
                                         var id = session.getString("id");
-                                        var timestamp = getFormattedTimestampString(session.getString("timestamp"));
+                                        var timestamp = Observation.getFormattedTimestampString(session.getString("timestamp"));
                                         return String.format("/element/%s/timestamp/%s", id, timestamp);
                                 })
                                 .body(io.gatling.javaapi.core.CoreDsl.StringBody(RequestBodyBuilder.extractJSONString))
@@ -47,13 +45,6 @@ public class WriteObservationsSimulation extends Simulation {
         static final class RequestBodyBuilder {
                 public static final Function<Session, String> extractJSONString =
                         session -> new Observation(session).toString();
-        }
-
-
-        public String getFormattedTimestampString(String timestamp) {
-                OffsetDateTime offsetDateTime = OffsetDateTime.parse(timestamp);
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                return offsetDateTime.format(formatter);
         }
 
 }

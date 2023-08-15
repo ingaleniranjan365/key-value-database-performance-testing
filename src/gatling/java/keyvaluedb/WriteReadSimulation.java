@@ -5,20 +5,20 @@ import static io.gatling.javaapi.http.HttpDsl.*;
 
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
-import model.Trip;
+import model.TripObservation;
 
 
 public class WriteReadSimulation extends Simulation {
 
         int applicationPort = 8081;
-        FeederBuilder<String> feeder = csv("trips.csv").circular();
+        FeederBuilder<String> feeder = csv("trip_observations.csv").circular();
 
         ScenarioBuilder insertAndRetrieve = scenario("Insert")
                 .feed(feeder)
                 .exec(
                         http("insert")
                                 .put(session -> {
-                                        var timestamp = Trip.getFormattedTimestampString(session.getString(
+                                        var timestamp = TripObservation.getFormattedTimestampString(session.getString(
                                                 "dropoff_datetime"));
                                         var id= session.getString("id");
                                         return String.format("/element/%s/timestamp/%s", id, timestamp);

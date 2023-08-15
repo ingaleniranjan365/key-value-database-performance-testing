@@ -9,7 +9,7 @@ import io.gatling.javaapi.http.*;
 public class ReadSimulation extends Simulation {
 
         int applicationPort = 8081;
-        FeederBuilder<String> feeder = csv("trips.csv").circular();
+        FeederBuilder<String> feeder = csv("trip_observations.csv").circular();
 
         ScenarioBuilder retrieve = scenario("Retrieve")
                 .feed(feeder)
@@ -27,7 +27,7 @@ public class ReadSimulation extends Simulation {
 
         {
                 setUp(
-                        retrieve.injectOpen(rampUsers(10).during(1))
+                        retrieve.injectOpen(rampUsers(1000).during(10))
                 ).protocols(httpProtocol);
         }
 

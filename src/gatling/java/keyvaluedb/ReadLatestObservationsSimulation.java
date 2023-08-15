@@ -3,9 +3,6 @@ package keyvaluedb;
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.*;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
 import model.TripObservation;
@@ -24,7 +21,6 @@ public class ReadLatestObservationsSimulation extends Simulation {
                 .exec(session -> {
                         var expectedTripJSONString = new TripObservation(session).toString();
                         var latestObservationJSONString = session.getString("responseBody");
-//                        var actualTripJSONStringForLatestObservation = getTripJSONString(latestObservationJSONString);
 
                         if(expectedTripJSONString.equals(latestObservationJSONString)) return session;
                         session.markAsFailed();
@@ -40,26 +36,5 @@ public class ReadLatestObservationsSimulation extends Simulation {
                 setUp(
                         retrieve.injectOpen(rampUsers(1000).during(10))
                 ).protocols(httpProtocol);
-        }
-
-        public static String getTripJSONString(String observationJSONString) {
-                try {
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        JsonNode jsonNode = objectMapper.readTree(observationJSONString);
-
-                        if (jsonNode.has("lat") && jsonNode.has("lon") && jsonNode.has("timestamp")) {
-                                ObjectNode updatedJson = (ObjectNode) jsonNode;
-                                updatedJson.remove("lat");
-                                updatedJson.remove("lon");
-                                updatedJson.remove("timestamp");
-
-                                return objectMapper.writeValueAsString(updatedJson);
-                        } else {
-                                return observationJSONString;
-                        }
-                } catch (Exception e) {
-                        e.printStackTrace();
-                        return "";
-                }
         }
 }

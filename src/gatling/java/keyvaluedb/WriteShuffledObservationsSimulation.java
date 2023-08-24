@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 public class WriteShuffledObservationsSimulation extends Simulation {
 
-        int applicationPort = 8081;
+        int applicationPort = 8080;
         FeederBuilder<String> feeder = csv("shuffled_trip_observations.csv").circular();
 
         ScenarioBuilder insertAndRetrieve = scenario("Insert")
@@ -37,7 +37,8 @@ public class WriteShuffledObservationsSimulation extends Simulation {
 
         {
                 setUp(
-                        insertAndRetrieve.injectOpen(rampUsers(107165).during(1000))
+//                        insertAndRetrieve.injectOpen(rampUsers(100000).during(200))
+                        insertAndRetrieve.injectOpen(rampUsers(323359).during(60*30))
                 ).protocols(httpProtocol);
         }
 

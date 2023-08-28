@@ -23,7 +23,7 @@ public class WriteReadSimulation extends Simulation {
                                         var id= session.getString("id");
                                         return String.format("/element/%s/timestamp/%s", id, timestamp);
                                 })
-                                .body(io.gatling.javaapi.core.CoreDsl.StringBody(WriteSimulation.RequestBodyBuilder.extractJSONString))
+                                .body(io.gatling.javaapi.core.CoreDsl.StringBody(WriteShuffledObservationsSimulation.RequestBodyBuilder.extractJSONString))
                                 .check(
                                         status().is(200)
                                 )
